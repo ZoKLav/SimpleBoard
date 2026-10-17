@@ -116,3 +116,23 @@ SimpleBoard is distributed under the author's **[No Fault License](https://githu
 Whisper, ONNX, and Vosk all retain their own licenses.
 
 **Your keyboard should type what you tell it, learn what you allow it to learn, and keep its business out of everyone else's hands. Gboard and the data-harvesting business model it represents can stay off your keyboard.**
+
+<p><img src="./screenshot/1.png" alt="Screenshot 1" width="700"></p>
+
+<p><img src="./screenshot/2.png" alt="Screenshot 2" width="700"></p>
+
+<p><img src="./screenshot/3.png" alt="Screenshot 3" width="700"></p>
+
+<p><img src="./screenshot/4.png" alt="Screenshot 4" width="700"></p>
+
+<p><img src="./screenshot/5.png" alt="Screenshot 5" width="700"></p>
+
+<p><img src="./screenshot/6.png" alt="Screenshot 6" width="700"></p>
+
+<p><img src="./screenshot/7.png" alt="Screenshot 7" width="700"></p>
+
+<p><img src="./screenshot/8.png" alt="Screenshot 8" width="700"></p>
+
+<p><img src="./screenshot/9.png" alt="Screenshot 9" width="700"></p>
+
+<p><img src="./screenshot/10.png" alt="Screenshot 10" width="700"></p>
