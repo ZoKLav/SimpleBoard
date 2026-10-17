@@ -1,138 +1,118 @@
 # SimpleBoard
 
-### A keyboard. Not a data-mining business model with keys attached.
+**SimpleBoard 0.3.1 — Usability Update**  
+**Android 7.0+** · **Offline by design** · **No `INTERNET` permission**
 
-SimpleBoard exists because typing on your own phone should not require surrendering another piece of your life to a corporation that has somehow convinced the industry that every basic utility needs analytics, cloud hooks, engagement metrics, personalization pipelines, account integration, telemetry, growth features, and three layers of bullshit between you and the thing you were trying to do.
+Gboard can keep Google's ecosystem. Your keyboard handles your passwords, private conversations, searches, and everything else you type. That's a terrible place for corporate data harvesting, advertising incentives, and the expectation that every useful feature must be connected to a company server.
 
-It is a keyboard. Its job is to put letters on the screen when you touch them.
+**SimpleBoard is an Android keyboard built to work for the person typing, not the company watching.** No Google services, account, ads, analytics SDK, cloud sync, or Internet permission. Autocorrect, word learning, predictions, and voice recognition run on your device. Your keyboard doesn't need to phone home to do its job.
 
----
-
-## Why this exists
-
-Modern Android keyboards are technically impressive and philosophically rotten. They are built by companies whose incentives are not aligned with yours. The keyboard is one of the most intimate pieces of software on a phone: it sits between you and your messages, passwords, searches, notes, arguments, jokes, banking apps, work, private conversations, and every other text field you touch.
-
-That should make keyboard software **more boring, more transparent, more local, and more under your control**.
-
-Instead, the industry went the other direction.
-
-Google's own Gboard documentation says the app sends usage statistics to Google, and that its standard talk-to-text feature sends voice to Google for transcription. Google also documents newer advanced voice typing modes that can keep more processing on-device, which is genuinely better, but the larger point remains: your keyboard should not require trusting a corporate platform's current privacy posture, current defaults, current server behavior, current product roadmap, or current promise that this particular category of data is being handled nicely today.
-
-SimpleBoard is the answer to that entire mindset.
-
-No telemetry. No analytics SDK. No ad network. No account. No cloud sync. No engagement garbage. No recommendation feed. No AI assistant wedged into the keyboard because a quarterly roadmap needed another checkbox. No mysterious network traffic from the keyboard itself. No pretending that a fucking keyboard needs to become a platform.
-
-SimpleBoard does not request Android's `INTERNET` permission.
-
-If a feature can be local, it stays local.
-
----
-
-## The point
-
-SimpleBoard is built around three ideas: **usability, customization, and user ownership**.
-
-The keyboard should adapt to you instead of training you to accommodate somebody else's product decisions. If you want a giant spacebar because you keep typing `typingnlikenthis.because.people.aren'tnperfect`, you should be able to make the spacebar taller. If you hate the emoji key, remove it. If you want the period on the left side, move the entire fucking key there. If you want the microphone in the suggestion strip instead of eating space on the bottom row, put it there. If you want translucent keys over a background image, you should not need to beg a theme engine for permission.
-
-Likewise, autocorrect should learn **your** vocabulary and let **you** correct its mistakes. A keyboard that insists it knows better than the person typing is not intelligent. It is annoying software with confidence problems.
-
-SimpleBoard is designed to expose those decisions instead of hiding them behind unexplained heuristics.
-
----
+And it isn't just a bare-bones protest keyboard. SimpleBoard has local neural predictions, two offline speech engines, encrypted learning, extensive layout controls, editable autocorrect, and themes you can actually customize.
 
 ## Features
 
-- **Fully local keyboard core.** No `INTERNET` permission, no telemetry, no analytics, no advertising, and no account requirement.
-- **Android 7.0 Nougat and newer.** Minimum API 24.
-- **Suggestion strip and local autocorrect.** Suggestions, automatic correction, configurable confidence, local learned words, explicit correction pairs, and a real dictionary/learning manager so bad behavior can be corrected manually instead of waiting for some invisible model to change its mind.
-- **Customizable number row and numeric layouts.** Normal number row support plus automatic numeric/phone layouts when apps correctly identify their input fields.
-- **One-handed mode.** Left or right alignment with configurable keyboard width.
-- **Independent keyboard sizing.** Keyboard height, letter size, key spacing, corner radius, border width, Enter-key width, and dedicated spacebar height controls.
-- **A deliberately larger spacebar.** The spacebar can grow vertically without making every neighboring punctuation key equally easy to hit by accident.
-- **Bottom-row control.** Show or hide the emoji key, relocate the period key entirely to the left side of the spacebar, resize Enter, and choose where the microphone control lives.
-- **Voice typing without forcing one implementation.** Use an external voice keyboard such as Google Voice Typing, use Android's `SpeechRecognizer` inline, or let Auto mode choose. The microphone can live on the bottom row, on the right side of the suggestion strip, or be hidden entirely.
-- **Configurable voice behavior.** Select an external voice input method, select an inline recognition provider, choose language behavior, prefer offline recognition when supported, enable or disable partial results, and control result count.
-- **Real appearance controls.** Visual color pickers instead of making normal people type hex values into boxes.
-- **Per-surface transparency.** Key fill, function keys, spacebar, and accent/Enter keys can use independent alpha values so keyboard backgrounds are actually visible.
-- **Keyboard background images.** Pick an image from storage and keep it locally.
-- **Full color control.** Board, key surfaces, function keys, spacebar, accent keys, letters, hints, borders, popup background, popup text, and popup borders.
-- **Theme import/export.** Portable SimpleBoard themes can include colors and the keyboard background image. HeliBoard-compatible color JSON import/export is also supported where the fields overlap.
-- **Per-key hold shortcuts.** Long-press behavior can be customized key by key instead of being baked into the layout forever.
-- **Text, symbols, emoji, and actions as shortcuts.** A hold shortcut can output characters, strings, emoji, or actions such as numpad, settings, voice, paste, cursor movement, emoji, Enter, and Tab.
-- **Custom popup editor.** Configure popup contents, delay, size, text scale, number of columns, shape, radius, spacing, border width, position, autoselection, and cancel behavior.
-- **Accent-character popups.** Useful defaults for common accented Latin characters remain available and can be overridden.
-- **Proper system-bar handling.** The keyboard respects Android navigation-bar insets instead of drawing half the bottom row underneath system controls.
-- **Local settings and local learning.** The things SimpleBoard learns belong on the device running SimpleBoard.
-- **No glide typing.** Intentionally. Absolutely not. If drawing shapes across a keyboard is your preferred lifestyle choice, there are other keyboards for that.
+### Typing and autocorrect
 
----
+- Three-slot suggestion strip, next-word suggestions, local autocorrect, and configurable correction confidence.
+- Personal word and short-phrase learning that persists across ordinary text fields and apps, without copying one app's text into another.
+- An editable dictionary: add and trust words, remove learned entries, block unwanted words from being learned again, and create explicit `typed → replacement` rules.
+- Optional **experimental offline neural prediction** using a bundled ONNX model based on **SmolLM2-135M**, with a lightweight local prediction engine as a fallback.
+- Automatic capitalization, double-space period, optional number row, key previews, vibration, and sound feedback.
+- Number and phone layouts when requested by the active text field.
 
-## Voice typing and the unavoidable reality of other people's software
+### Layout customization
 
-SimpleBoard itself does not need Internet access, but Android lets it hand voice input to another installed service or keyboard. That provider has its own permissions, privacy policy, network behavior, and bad decisions.
+- Adjustable keyboard height, key spacing, text size, corner radius, and borders.
+- Independently adjustable spacebar height and Enter-key width.
+- Move the period key to the left of Space; show or hide the emoji key.
+- Left- or right-handed one-handed mode with adjustable width.
+- Custom long-press actions for individual keys, including symbols, accented characters, emoji, navigation, paste, settings, and voice typing.
+- Fine-grained popup controls for timing, size, placement, columns, appearance, and selection behavior.
 
-If you select Google Voice Typing, Google is doing the voice recognition. SimpleBoard is not secretly laundering that through its own servers because SimpleBoard has no servers and no Internet permission in the first place.
+### Themes and appearance
 
-Inline mode uses Android's public speech-recognition APIs. Android's `SpeechRecognizer` framework can route recognition to an installed recognition service, including a specific provider where supported. Whether that provider performs recognition locally or remotely is the provider's problem and should be evaluated separately.
+- Custom colors for the keyboard surface, keys, function keys, spacebar, Enter key, letters, symbols, hints, popups, and borders.
+- Independent key transparency and support for a local keyboard background image.
+- Import and export of `.simpleboardtheme` themes.
+- Import and export of HeliBoard-compatible color JSON for supported appearance settings.
 
-The important distinction is simple: **SimpleBoard does not need network access just because somebody wants a microphone button.**
+### Offline voice typing
 
----
+SimpleBoard doesn't hand your microphone over to Google Voice Typing or depend on an external Android speech provider. It has two on-device engines:
 
-## Privacy model
+| Engine | What it does |
+| --- | --- |
+| **Vosk** | Bundled English offline model, streaming partial transcription, and recording sessions up to **120 seconds**. |
+| **Whisper (whisper.cpp)** | Optional multilingual models, automatic language detection or supported language selection, and transcription after recording up to **60 seconds**. |
 
-There is no privacy policy full of reassuring prose because there is almost nothing for one to describe.
+The microphone appears at the right edge of the suggestion strip when voice typing is enabled and permitted in the current field. Microphone audio is processed locally without intentionally saving audio recordings. Whisper model weights are separate from the app; the recognition itself runs offline.
 
-SimpleBoard does not contain telemetry code. It does not contain an analytics SDK. It does not upload typing statistics. It does not have an account system. It does not sync learned words to a corporate backend. It does not phone home because there is nowhere to phone home to.
+### Privacy and control
 
-The app requests microphone permission only for inline speech recognition. External voice-keyboard mode uses the external keyboard or voice provider's own microphone access instead.
+- **No `INTERNET` permission.** No ads, analytics SDK, account requirement, or cloud-based typing pipeline.
+- **Encrypted local learning.** Personal word frequencies, phrase patterns, and correction rules are kept in a SQLCipher database with a key protected by Android Keystore.
+- **No intentional full-message or audio archive.** The keyboard learns limited word and phrase patterns, not a running copy of every conversation.
+- **Sensitive-field exclusions.** Password, protected/private, email, and URL fields are excluded from personal learning.
+- **User-controlled learning.** Pause learning, clear learned data, edit individual entries, and override autocorrect behavior.
+- **No automatic Android app-data backup.** Themes and some ordinary settings are stored locally but are not part of the encrypted learning database.
 
-Background images, preferences, learned words, corrections, shortcuts, and themes are handled locally unless **you** explicitly export something.
+None of that makes a compromised phone magically secure. It means SimpleBoard itself isn't designed as another corporate collection point for the contents of your keyboard.
 
-That is what “privacy by design” is supposed to mean before marketing departments hollow the phrase out and staple it to a banner ad.
+## Changelog
 
----
+### 0.3.1 — Usability Update
 
-## Autocorrect that can be told when it is wrong
+A release focused on making typing more responsive and offline dictation more reliable, without pretending a keyboard needs the cloud to accomplish either.
 
-Autocorrect is useful. Autocorrect that cannot be corrected is a tiny authoritarian living under your thumbs.
+**Typing and prediction**
 
-SimpleBoard separates learned words from explicit corrections. Learned behavior can influence suggestions, but an explicit correction is an instruction from the person who owns the device. The keyboard should respect that hierarchy.
+- Moved routine suggestion searches and learning writes off the main typing thread.
+- Coalesced suggestion requests over **80 ms** and discarded stale results.
+- Delayed neural prediction until a **600 ms pause** in typing; a new keypress interrupts pending inference.
+- Limited neural inference to one background-priority thread. After three timeouts, neural work backs off for the current keyboard-service lifetime instead of repeatedly retrying on app switches.
 
-If SimpleBoard keeps mangling a name, technical term, character name, acronym, bit of slang, or deliberately unusual spelling, add it. If it learned garbage, remove it. If a correction pair should always win, define it yourself.
+**Learning and persistence**
 
-No mystical cloud brain required.
+- Kept recently used personal words and phrases at full ranking weight for **seven days**, followed by the existing **30-day half-life** decay.
+- Made phrase pruning less aggressive: recently used entries are protected, older entries are retained more generously, and maintenance runs at most once per hour.
+- Preserved encrypted, persistent learning across apps while keeping actual editor text isolated between them.
 
----
+**Voice typing**
 
-## Themes without a subscription, storefront, or artificial scarcity
+- Moved the microphone permanently to the **right of the suggestion strip**, freeing the keyboard's bottom row.
+- Reworked Vosk capture around a dedicated audio thread and bounded in-memory queue.
+- Allowed microphone capture to begin while the Vosk recognition model finishes loading, reducing the chance of missing speech at the start of a session.
+- Made **Done** drain queued audio before finalizing and **Cancel** discard the session.
+- Increased Vosk recording time to **two minutes** and improved reporting of capture failures or queue overload instead of silently returning incomplete output.
+- Left Whisper's existing one-minute, record-then-transcribe workflow unchanged.
 
-Themes are configuration, not content monetization.
+**Other fixes**
 
-SimpleBoard lets you control the keyboard background, colors, transparency, borders, key shapes, sizing, popup appearance, and related visual behavior directly. Theme files can be exported and shared like normal files because settings created by the user should be owned by the user.
+- Included a SQLCipher startup fix and native build-cache/timestamp fixes in the 0.3.1 source changes.
+- Updated the app version to **0.3.1**.
 
-There is no theme marketplace. There are no premium colors. There is no monthly subscription to make the fucking keys purple.
+### 0.3.0 — Multilingual offline speech
 
----
+- Added on-device **Whisper / whisper.cpp** transcription as an alternative to Vosk.
+- Added optional verified multilingual Whisper model management, with model integrity checks.
+- Added automatic speech-language detection and supported language choices.
+- Expanded parts of the settings interface with additional localization.
 
-## What SimpleBoard is not trying to become
+### Earlier 0.2.x and 0.1.x development
 
-SimpleBoard is not trying to become Google Search, an AI chatbot, a sticker storefront, a social network, a browser, a writing coach, a shopping assistant, a crypto wallet, a content feed, or whatever other product-management hallucination gets stapled onto keyboards next year.
+The project has changed substantially since its early releases. Features added over that development include:
 
-Feature requests are welcome when they make the keyboard **better at being a keyboard**.
-
-If a proposed feature requires collecting user behavior because somebody wants a dashboard, the answer is no.
-
-If it requires an account for no technical reason, the answer is no.
-
-If it requires cloud infrastructure for something that works perfectly well locally, the answer is probably no.
-
-If it exists primarily because a corporation discovered another surface on which to extract data, attention, money, or dependency, the answer is **fuck no**.
-
----
+- Offline **Vosk** dictation with a bundled English model.
+- Encrypted and persistent personal learning, editable corrections, and phrase-based suggestions.
+- Optional local neural predictions with an ONNX model.
+- Expanded keyboard sizing, layout, long-press, one-handed, and appearance controls.
+- Theme import/export and compatible color-theme exchange.
+- A much more extensive settings interface and finer control over autocorrect and privacy.
 
 ## License
 
-All of my software uses my proprietary No Fault License.
+SimpleBoard is distributed under the author's **[No Fault License](https://github.com/ZoKLav/no_fault_license/blob/main/no_fault_license.md)**. Third-party software and models retain their own licenses; see the repository's third-party notices for attribution.
 
-https://github.com/ZoKLav/no_fault_license/blob/main/no_fault_license.md
+Whisper, ONNX, and Vosk all retain their own licenses.
+
+**Your keyboard should type what you tell it, learn what you allow it to learn, and keep its business out of everyone else's hands. Gboard and the data-harvesting business model it represents can stay off your keyboard.**
