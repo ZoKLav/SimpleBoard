@@ -60,6 +60,16 @@ None of that makes a compromised phone magically secure. It means SimpleBoard it
 
 ## Changelog
 
+### 0.3.2
+
+## Changes
+
+- **Longer completions without ONNX:** reads the existing 113,915-word `neural/lexicon.tsv` on the suggestion worker. Completes beyond the starter dictionary's limited vocabulary and considers a mistyped letter or adjacent letter transposition anywhere in the prefix. Exactly typed text stays in the first slot. Blocked alternatives remain excluded.
+- **Missing-space suggestions:** offers a tappable repair for joined words using the common/personal dictionary, with up to two single-edit slips across at most six words and 48 characters. Repeated-key slips get preference over substituting an unrelated letter. These are suggestions, never automatic phrase replacements. Ambiguous inputs can produce a different phrase.
+- **Word boundaries:** spaces and punctuation still end the current word. `but.the.man.said` remains punctuated; each following word gets fresh suggestions. The update does not turn deliberate periods into spaces.
+- **Typing:** caches theme, geometry, and popup hints; rebuilds rows only when layout or case changes; handles overlapping finger presses; avoids cancelling idle speech on ordinary keypresses; reduces the suggestion debounce from 80 to 32 ms. These remove specific sources of work, but are not measured frame-rate claims.
+- **ONNX:** keeps the current CPU provider, supports a compressed model asset by copying it to the app cache off the UI thread, rejects missing/LFS-pointer model placeholders with an actionable message, and exposes the exception class/message in the existing neural-status setting. Prediction timeout increases from 750 to 2500 ms. Repeated timeouts temporarily back off rather than disabling neural work for the whole service lifetime. Cache copies from older APKs are cleaned up after a successful copy.
+
 ### 0.3.1 — Usability Update
 
 A release focused on making typing more responsive and offline dictation more reliable, without pretending a keyboard needs the cloud to accomplish either.
