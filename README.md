@@ -1,6 +1,6 @@
 # SimpleBoard
 
-**SimpleBoard 0.3.1 — Usability Update**  
+**SimpleBoard 0.3.2 — Suggestion/Predictive Update**  
 **Android 7.0+** · **Offline by design** · **No `INTERNET` permission**
 
 Gboard can keep Google's ecosystem. Your keyboard handles your passwords, private conversations, searches, and everything else you type. That's a terrible place for corporate data harvesting, advertising incentives, and the expectation that every useful feature must be connected to a company server.
