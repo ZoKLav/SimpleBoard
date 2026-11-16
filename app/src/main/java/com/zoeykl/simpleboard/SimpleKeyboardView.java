@@ -20,7 +20,7 @@ import java.util.List;
 
 public final class SimpleKeyboardView extends View {
     public interface Listener { void onKey(KeySpec key); void onPopupText(String text); }
-    private static final class KeyBox { KeySpec key; RectF rect; KeyBox(KeySpec k,RectF r){key=k;rect=r;} }
+    private static final class KeyBox { final KeySpec key; final RectF rect; final String popup,hint; KeyBox(KeySpec k,RectF r,String p,String h){key=k;rect=r;popup=p;hint=h;} }
 
     private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Handler handler=new Handler(Looper.getMainLooper());
@@ -28,6 +28,7 @@ public final class SimpleKeyboardView extends View {
     private final List<KeyBox> boxes=new ArrayList<>();
     private Listener listener;
     private KeyBox pressed;
+    private int activePointer=-1;
     private boolean popupActive=false;
     private String[] popupEntries=new String[0];
     private RectF popupRect=new RectF();
@@ -38,17 +39,18 @@ public final class SimpleKeyboardView extends View {
     private ThemeConfig theme;
     private float contentLeft,contentRight,contentBottom;
     private int navInsetLeft,navInsetRight,navInsetBottom;
+    private boolean boxesDirty=true;
 
     public SimpleKeyboardView(Context c){ super(c); setFocusable(false); refreshPrefs(); }
     public void setListener(Listener l){listener=l;}
-    public void setRows(List<List<KeySpec>> r){rows=r==null?new ArrayList<List<KeySpec>>():r;requestLayout();invalidate();}
+    public void setRows(List<List<KeySpec>> r){rows=r==null?new ArrayList<List<KeySpec>>():r;boxesDirty=true;requestLayout();invalidate();}
     public void refreshPrefs(){
         theme=ThemeConfig.read(getContext());
         background=null;
         if(theme.backgroundPath!=null&&!theme.backgroundPath.isEmpty()){
             try{File f=new File(theme.backgroundPath);if(f.isFile())background=BitmapFactory.decodeFile(f.getAbsolutePath());}catch(Exception ignored){}
         }
-        requestLayout(); invalidate();
+        boxesDirty=true;requestLayout(); invalidate();
     }
 
     @Override protected void onMeasure(int wSpec,int hSpec){
@@ -67,14 +69,17 @@ public final class SimpleKeyboardView extends View {
             left=insets.getSystemWindowInsetLeft();right=insets.getSystemWindowInsetRight();bottom=insets.getSystemWindowInsetBottom();
         }
         if(left!=navInsetLeft||right!=navInsetRight||bottom!=navInsetBottom){
-            navInsetLeft=left;navInsetRight=right;navInsetBottom=bottom;requestLayout();invalidate();
+            navInsetLeft=left;navInsetRight=right;navInsetBottom=bottom;boxesDirty=true;requestLayout();invalidate();
         }
         return insets;
     }
 
+    @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){
+        super.onSizeChanged(w,h,oldw,oldh);boxesDirty=true;
+    }
+
     @Override protected void onDraw(Canvas c){
         super.onDraw(c);
-        theme=ThemeConfig.read(getContext());
         paint.setStyle(Paint.Style.FILL);paint.setColor(theme.board);c.drawRect(0,0,getWidth(),getHeight(),paint);
         if(background!=null)drawCenterCrop(c,background,new RectF(0,0,getWidth(),getHeight()));
         layoutBoxes();
@@ -90,7 +95,8 @@ public final class SimpleKeyboardView extends View {
     }
 
     private void layoutBoxes(){
-        boxes.clear(); if(rows.isEmpty())return;
+        if(!boxesDirty)return;
+        boxesDirty=false;boxes.clear(); if(rows.isEmpty())return;
         int mode=Prefs.i(getContext(),"one_hand_mode",0); float one=Prefs.i(getContext(),"one_hand_width",76)/100f;
         float safeLeft=navInsetLeft,safeRight=getWidth()-navInsetRight;
         contentLeft=safeLeft;contentRight=safeRight;contentBottom=Math.max(0,getHeight()-navInsetBottom);
@@ -118,7 +124,7 @@ public final class SimpleKeyboardView extends View {
                     top=bandTop+extra+gap;
                     bottom=bandBottom-extra-gap;
                 }
-                RectF r=new RectF(x+gap,top,x+kw-gap,bottom);boxes.add(new KeyBox(k,r));x+=kw;
+                RectF r=new RectF(x+gap,top,x+kw-gap,bottom);String pop=popupRaw(k.label);int divider=pop.indexOf('|');String hint=popupDisplay(divider<0?pop:pop.substring(0,divider));boxes.add(new KeyBox(k,r,pop,hint));x+=kw;
             }
             bandTop=bandBottom;
         }
@@ -133,8 +139,7 @@ public final class SimpleKeyboardView extends View {
         paint.setStyle(Paint.Style.FILL);paint.setColor(theme.text);paint.setTextAlign(Paint.Align.CENTER);
         float size=sp(20)*(theme.textScale/100f); if(b.key.label.length()>4)size*=0.72f; paint.setTextSize(size);
         Paint.FontMetrics fm=paint.getFontMetrics();float cy=b.rect.centerY()-(fm.ascent+fm.descent)/2f;c.drawText(b.key.label,b.rect.centerX(),cy,paint);
-        String pop=popupRaw(b.key.label);
-        if(!pop.isEmpty()){paint.setTextAlign(Paint.Align.RIGHT);paint.setTextSize(sp(8));paint.setColor(theme.hint);String first=popupDisplay(pop.split("\\|")[0]);c.drawText(first,b.rect.right-dp(4),b.rect.top+dp(10),paint);}
+        if(!b.popup.isEmpty()){paint.setTextAlign(Paint.Align.RIGHT);paint.setTextSize(sp(8));paint.setColor(theme.hint);c.drawText(b.hint,b.rect.right-dp(4),b.rect.top+dp(10),paint);}
     }
 
     private void drawPreview(Canvas c,KeyBox b){
@@ -144,7 +149,7 @@ public final class SimpleKeyboardView extends View {
     }
 
     private void showPopup(){
-        if(pressed==null)return; String raw=popupRaw(pressed.key.label); if(raw.trim().isEmpty())return;
+        if(pressed==null)return; String raw=pressed.popup; if(raw.trim().isEmpty())return;
         popupEntries=raw.split("\\|"); if(popupEntries.length==0)return; popupActive=true;popupSelected=Prefs.b(getContext(),"popup_autoselect",true)?0:-1;
         int cols=Math.max(1,Math.min(theme.popupColumns,popupEntries.length));int rowsCount=(popupEntries.length+cols-1)/cols;
         float cellW=dp(48)*(theme.popupScale/100f),cellH=dp(50)*(theme.popupScale/100f);float w=cols*cellW,h=rowsCount*cellH;
@@ -163,21 +168,35 @@ public final class SimpleKeyboardView extends View {
     }
 
     @Override public boolean onTouchEvent(MotionEvent e){
-        float x=e.getX(),y=e.getY();
-        switch(e.getActionMasked()){
+        layoutBoxes();
+        int action=e.getActionMasked();
+        int index=(action==MotionEvent.ACTION_MOVE)?e.findPointerIndex(activePointer):e.getActionIndex();
+        if(index<0){if(action==MotionEvent.ACTION_CANCEL){cancelTimers();activePointer=-1;pressed=null;popupActive=false;invalidate();}return true;}
+        float x=e.getX(index),y=e.getY(index);
+        switch(action){
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if(popupActive)return true;
+                // Rollover: commit the earlier finger before tracking the next key.
+                cancelTimers();
+                if(pressed!=null&&listener!=null)listener.onKey(pressed.key);
+                layoutBoxes();
+                // fall through
             case MotionEvent.ACTION_DOWN:
+                activePointer=e.getPointerId(index);
                 cancelTimers();popupActive=false;popupSelected=-1;pressed=find(x,y);
                 if(pressed!=null){int delay=Prefs.i(getContext(),"hold_delay",350);longPressRunnable=this::showPopup;handler.postDelayed(longPressRunnable,delay);if(pressed.key.action==KeySpec.Action.DELETE){repeatRunnable=new Runnable(){public void run(){if(pressed!=null&&!popupActive&&listener!=null)listener.onKey(pressed.key);handler.postDelayed(this,70);}};handler.postDelayed(repeatRunnable,500);}invalidate();return true;}
                 return false;
             case MotionEvent.ACTION_MOVE:
                 if(popupActive){popupSelected=popupIndex(x,y);invalidate();}return true;
+            case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_UP:
-                cancelTimers();
+                if(e.getPointerId(index)!=activePointer)return true;
+                activePointer=-1;cancelTimers();
                 if(popupActive){int idx=popupSelected;if(idx>=0&&idx<popupEntries.length&&listener!=null)listener.onPopupText(popupEntries[idx]);}
                 else if(pressed!=null&&listener!=null)listener.onKey(pressed.key);
                 pressed=null;popupActive=false;popupEntries=new String[0];invalidate();return true;
             case MotionEvent.ACTION_CANCEL:
-                cancelTimers();pressed=null;popupActive=false;invalidate();return true;
+                activePointer=-1;cancelTimers();pressed=null;popupActive=false;invalidate();return true;
         }
         return true;
     }

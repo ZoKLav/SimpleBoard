@@ -8,6 +8,8 @@ import java.util.Locale;
 public final class AutocorrectEngine {
     private final Context context;
     private final WordStore store;
+    private WordSuggestions lexicon;
+    private boolean lexiconAttempted;
     public AutocorrectEngine(Context c,WordStore s){context=c;store=s;}
     public String correction(String typed){
         if(!Prefs.b(context,"autocorrect",true)||typed==null)return null;
@@ -30,15 +32,26 @@ public final class AutocorrectEngine {
         out.add(typed); // Always allow keeping exactly what was typed.
         String explicit=store.correctionFor(typed);if(explicit!=null)add(out,preserveCase(typed,explicit));
         if(Prefs.b(context,"next_word_predictions",true))for(String word:store.predict(previous,typed,5))add(out,preserveCase(typed,word));
-        if(out.size()>=3)return out;
-        if(!store.isKnown(typed)&&typed.length()>=3){
-            for(WordStore.Candidate c:store.closeCandidates(typed,8))if(c.distance==1)add(out,preserveCase(typed,c.word));
-        }
+        java.util.Map<String,Integer> vocabulary=store.suggestionVocabulary();
+        String split=WordSuggestions.split(typed,vocabulary);
+        // Reserve an alternative for a joined phrase, even when prefix predictions filled the strip.
+        if(split!=null){if(out.size()>=3)out.remove(out.size()-1);add(out,preserveCase(typed,split));}
         if(out.size()>=3)return out;
         for(WordStore.Candidate c:store.prefix(typed,8))add(out,preserveCase(typed,c.word));
+        if(out.size()>=3)return out;
+        if(!lexiconAttempted){
+            lexiconAttempted=true;
+            try{lexicon=new WordSuggestions(new java.io.InputStreamReader(context.getAssets().open("neural/lexicon.tsv"),java.nio.charset.StandardCharsets.UTF_8));}
+            catch(java.io.IOException failure){android.util.Log.w("SimpleBoard","Completion lexicon unavailable",failure);}
+        }
+        if(lexicon!=null){
+            java.util.Set<String> blocked=store.blockedWords();
+            for(String word:lexicon.complete(typed,vocabulary,12))if(!blocked.contains(word))add(out,preserveCase(typed,word));
+        }
         if(out.size()<3&&typed.length()>=3)for(WordStore.Candidate c:store.closeCandidates(typed,8))add(out,preserveCase(typed,c.word));
         return out;
     }
+
     private void add(List<String> out,String word){if(out.size()<3&&!out.contains(word))out.add(word);}
     public void learn(String word){learn(word,new String[0],false);}
     public void learn(String word,String[] previous,boolean accepted){

@@ -172,6 +172,13 @@ public final class WordStore extends SQLiteOpenHelper {
     public String correctionFor(String bad){ Cursor c=getReadableDatabase().rawQuery("SELECT good FROM corrections WHERE bad=?",new String[]{norm(bad)}); try{return c.moveToFirst()?c.getString(0):null;}finally{c.close();} }
     public void deleteCorrection(String bad){ getWritableDatabase().delete("corrections","bad=?",new String[]{norm(bad)}); }
 
+    public java.util.Map<String,Integer> suggestionVocabulary(){
+        java.util.Map<String,Integer> words=new java.util.HashMap<>();
+        try(Cursor c=getReadableDatabase().rawQuery("SELECT word,freq FROM words WHERE blocked=0",null)){
+            while(c.moveToNext())words.put(c.getString(0),c.getInt(1));
+        }
+        return words;
+    }
     public List<Candidate> prefix(String prefix,int limit){
         String p=norm(prefix);List<Candidate> out=new ArrayList<>();if(p.isEmpty())return out;
         Cursor c=getReadableDatabase().rawQuery("SELECT w.word,w.freq,COALESCE(u.score,0),COALESCE(u.updated,0) FROM words w LEFT JOIN usage u ON u.word=w.word WHERE w.blocked=0 AND substr(w.word,1,length(?))=?",new String[]{p,p});

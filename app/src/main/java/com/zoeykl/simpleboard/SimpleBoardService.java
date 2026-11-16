@@ -52,6 +52,8 @@ public final class SimpleBoardService extends InputMethodService implements Simp
     private long suggestionGeneration;
     private java.util.concurrent.Future<?> suggestionTask;
     private boolean serviceDestroyed;
+    private int renderedMode=-1;
+    private boolean renderedShift,renderedCaps;
     private final Runnable delayedSuggestions=this::computeSuggestions;
     private void cancelSuggestions(){
         suggestionGeneration++;suggestionHandler.removeCallbacks(delayedSuggestions);
@@ -75,7 +77,7 @@ public final class SimpleBoardService extends InputMethodService implements Simp
         android.widget.Button cancel=new android.widget.Button(this);cancel.setText(R.string.cancel);cancel.setOnClickListener(v->{stopVoice();updateSuggestions();});
         voiceActions.addView(done,new LinearLayout.LayoutParams(0,-2,1));voiceActions.addView(cancel,new LinearLayout.LayoutParams(0,-2,1));
         voicePanel.addView(voiceActions);root.addView(voicePanel,new LinearLayout.LayoutParams(-1,-2));
-        keyboard=new SimpleKeyboardView(this);keyboard.setListener(this);
+        keyboard=new SimpleKeyboardView(this);keyboard.setListener(this);renderedMode=-1;
         root.addView(suggestions,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
         root.addView(keyboard,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
         refreshUi();return root;
@@ -88,19 +90,19 @@ public final class SimpleBoardService extends InputMethodService implements Simp
         updateAutoShift();refreshUi();
     }
 
-    @Override public void onStartInputView(EditorInfo info,boolean restarting){super.onStartInputView(info,restarting);if(keyboard!=null)keyboard.refreshPrefs();refreshUi();updateSuggestions();}
+    @Override public void onStartInputView(EditorInfo info,boolean restarting){super.onStartInputView(info,restarting);if(keyboard!=null)keyboard.refreshPrefs();renderedMode=-1;refreshUi();updateSuggestions();}
     @Override public void onFinishInputView(boolean finishingInput){cancelSuggestions();if(neural!=null)neural.idle();flushLearning();stopVoice();super.onFinishInputView(finishingInput);}
     @Override public void onFinishInput(){cancelSuggestions();if(neural!=null)neural.idle();flushLearning();super.onFinishInput();stopVoice();}
     @Override public void onDestroy(){serviceDestroyed=true;cancelSuggestions();if(neural!=null)neural.close();discardLearning();stopVoice();if(speech!=null)speech.close();suggestionWorker.execute(()->{if(store!=null)store.close();});suggestionWorker.shutdown();super.onDestroy();}
 
     private void refreshUi(){
-        if(keyboard!=null){switch(layoutMode){case 1:keyboard.setRows(LayoutFactory.symbols(this));break;case 2:keyboard.setRows(LayoutFactory.numpad(this,false));break;case 3:keyboard.setRows(LayoutFactory.numpad(this,true));break;case 4:keyboard.setRows(LayoutFactory.emoji(this));break;default:keyboard.setRows(LayoutFactory.alphabet(this,shifted,capsLocked));break;}}
+        if(keyboard!=null&&(renderedMode!=layoutMode||renderedShift!=shifted||renderedCaps!=capsLocked)){renderedMode=layoutMode;renderedShift=shifted;renderedCaps=capsLocked;switch(layoutMode){case 1:keyboard.setRows(LayoutFactory.symbols(this));break;case 2:keyboard.setRows(LayoutFactory.numpad(this,false));break;case 3:keyboard.setRows(LayoutFactory.numpad(this,true));break;case 4:keyboard.setRows(LayoutFactory.emoji(this));break;default:keyboard.setRows(LayoutFactory.alphabet(this,shifted,capsLocked));break;}}
         if(suggestions!=null){suggestions.refresh();boolean suggestionWords=Prefs.b(this,"suggestions",true)&&!privateField&&(layoutMode==0);boolean stripVoice=Prefs.b(this,"voice_enabled",true)&&!secureField&&(layoutMode==0);boolean show=suggestionWords||stripVoice;suggestions.setVisibility(show?View.VISIBLE:View.GONE);if(!suggestionWords)suggestions.setSuggestions(new ArrayList<String>());}
     }
 
     @Override public void onKey(KeySpec key){
         cancelSuggestions();if(neural!=null)neural.typing();
-        if(key.action!=KeySpec.Action.VOICE)stopVoice();
+        if(voiceActive&&key.action!=KeySpec.Action.VOICE)stopVoice();
         feedback();
         switch(key.action){
             case TEXT: handleText(key.output); break;
@@ -186,7 +188,7 @@ public final class SimpleBoardService extends InputMethodService implements Simp
     @Override public void onVoice(){startVoice();}
     private void updateSuggestions(){
         cancelSuggestions();
-        if(!serviceDestroyed)suggestionHandler.postDelayed(delayedSuggestions,80);
+        if(!serviceDestroyed)suggestionHandler.postDelayed(delayedSuggestions,32);
     }
     private void computeSuggestions(){
         if(suggestions==null||suggestions.getVisibility()!=View.VISIBLE)return;
