@@ -1,0 +1,76 @@
+plugins { id 'com.android.application' }
+
+def signingFile = rootProject.file('signing/signing.properties')
+def signingValues = new Properties()
+if (signingFile.isFile()) signingFile.withInputStream { signingValues.load(it) }
+
+android {
+    namespace 'com.zoeykl.simpleboard'
+    compileSdk 35
+    ndkVersion '27.2.12479018'
+    defaultConfig {
+        applicationId 'com.zoeykl.simpleboard'
+        minSdk 24
+        targetSdk 35
+        versionCode 33
+        versionName '0.3.3'
+        ndk { abiFilters 'arm64-v8a', 'armeabi-v7a' }
+        externalNativeBuild { cmake { cppFlags '-std=c++17' } }
+    }
+    externalNativeBuild { cmake { path file('src/main/cpp/CMakeLists.txt'); version '3.22.1' } }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+    }
+    buildTypes {
+        release { minifyEnabled false; debuggable false }
+    }
+    if (signingFile.isFile()) {
+        signingConfigs {
+            release {
+                storeFile new File(signingFile.parentFile, signingValues['storeFile'])
+                storePassword signingValues['storePassword']
+                keyAlias signingValues['keyAlias']
+                keyPassword signingValues['keyPassword']
+            }
+        }
+        buildTypes.release.signingConfig signingConfigs.release
+    }
+    androidResources { noCompress 'onnx', 'bin', 'mdl', 'fst' }
+    packaging { jniLibs { useLegacyPackaging false } }
+}
+
+dependencies {
+    implementation 'com.alphacephei:vosk-android:0.3.75@aar'
+    implementation 'net.java.dev.jna:jna:5.18.1@aar'
+    implementation 'net.zetetic:sqlcipher-android:4.6.1@aar'
+    implementation 'androidx.sqlite:sqlite:2.4.0'
+    implementation 'com.microsoft.onnxruntime:onnxruntime-android:1.23.2'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+}
+
+// Reject missing / Git LFS placeholder voice files before producing an APK.
+tasks.register('verifySpeechAssets') {
+    inputs.dir('src/main/assets/voice')
+    doLast {
+        def root = file('src/main/assets/voice')
+        file("$root/files.tsv").eachLine('UTF-8') { line ->
+            def parts = line.split('\t')
+            def asset = file("$root/en-us-0.22-lgraph/${parts[0]}")
+            if (!asset.isFile() || asset.length() != parts[1].toLong()) {
+                throw new GradleException("Missing speech asset: ${parts[0]}. Run python3 scripts/prepare_models.py first.")
+            }
+            def digest = java.security.MessageDigest.getInstance('SHA-256')
+            asset.withInputStream { stream ->
+                byte[] buffer = new byte[65536]
+                int n
+                while ((n = stream.read(buffer)) != -1) digest.update(buffer, 0, n)
+            }
+            if (digest.digest().encodeHex().toString() != parts[2]) {
+                throw new GradleException("Speech asset checksum mismatch: ${parts[0]}")
+            }
+        }
+    }
+}
+tasks.named('preBuild').configure { dependsOn 'verifySpeechAssets' }

@@ -1,0 +1,17 @@
+{
+  "model": "HuggingFaceTB/SmolLM2-135M",
+  "original_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+  "onnx_repository": "onnx-community/SmolLM2-135M-ONNX",
+  "onnx_revision": "d0ae6834f1df45e0e95b5fdae95e536f9ca7cd3f",
+  "source_sha256": "50ba80511ce74634d232a043b6c37775cca756b826b49d0a4a8eff958c4bbcc9",
+  "model_license": "Apache-2.0",
+  "lexicon_source": "cmudict 1.1.2 (Carnegie Mellon University)",
+  "lexicon_words": 113915,
+  "changes": "Final-position Gather plus dynamic int8 final projection; pretrained integer weights unchanged; activations additionally quantized in final projection.",
+  "files": {
+    "model.onnx": "b6718204dbd1bd5e344bc7bdb3207a95c12648873c6149324a528be41a4ccb52",
+    "lexicon.tsv": "f848ad0f0b24058556d31ba458e7e32d42e2674b4775ad7dfa0f8f6791988482",
+    "tokenizer.bin": "01508839ba471187563580c4d4cd7ba673ee3e078f399b98f2b15dcfd00b31e5",
+    "boundaries.txt": "0055f5bee4ba031a8c546a47b28447d893c462fadc27bbe4af7bd530a9be0aaa"
+  }
+}

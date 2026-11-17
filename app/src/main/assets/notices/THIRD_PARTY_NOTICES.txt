@@ -1,0 +1,54 @@
+SimpleBoard 0.3.3 — third-party components
+
+SimpleBoard: ZoKLav/SimpleBoard, No Faults Software License 1.0.
+The author's license is retained in licenses/SimpleBoard-license.txt.
+
+Default English dictionary: dwyl/english-words, words_alpha.txt.
+https://github.com/dwyl/english-words
+Unlicense/public-domain dedication, without an attribution requirement.
+The packaged, normalized 370,105-entry list is in assets/dictionary/english.txt.
+Terms are retained in licenses/dictionary-Unlicense.txt.
+
+The curated English contractions, proper-noun defaults and grammar rules added
+for 0.3.3 are original project code and do not use an external grammar corpus.
+
+Vosk Android runtime 0.3.75: Alpha Cephei, Apache License 2.0.
+https://github.com/alphacep/vosk-api
+Bundled vosk-model-en-us-0.22-lgraph: Alpha Cephei, Apache License 2.0.
+https://alphacephei.com/vosk/models
+The SHA-256-pinned model metadata is retained in assets/voice/manifest.json.
+License text: licenses/Vosk-Apache-2.0.txt.
+
+JNA 5.18.1: Java Native Access contributors; distributed using its Apache 2.0
+licensing option. https://github.com/java-native-access/jna
+License information: licenses/JNA-license.txt and the Apache 2.0 text above.
+
+SQLCipher Android 4.6.1: Zetetic LLC, BSD-style license.
+https://github.com/sqlcipher/sqlcipher-android
+License: licenses/SQLCipher-license.txt.
+
+ONNX Runtime Android 1.23.2: Microsoft Corporation, MIT License.
+https://github.com/microsoft/onnxruntime
+License: licenses/ONNX-Runtime-MIT.txt.
+
+SmolLM2-135M prediction weights: HuggingFaceTB, Apache License 2.0;
+ONNX conversion: onnx-community/SmolLM2-135M-ONNX.
+Source revisions and hashes: assets/neural/manifest.json.
+The existing neural-only lexicon derives from CMUdict 1.1.2, Carnegie Mellon
+University. Its license is retained in licenses/CMUdict-license.txt. It remains
+separate from the new public-domain default dictionary.
+
+whisper.cpp v1.9.5 and GGML: MIT License; upstream licenses are retained within
+app/src/main/cpp/whisper/LICENSE and the vendored GGML tree.
+Whisper model metadata: assets/whisper-provenance.json.
+https://github.com/ggml-org/whisper.cpp
+Optional Whisper weights are not included in either distribution.
+
+AndroidX SQLite 2.4.0, Android core-library desugaring 2.1.5, Android Gradle
+plugin 8.9.2 and Gradle wrapper 8.13: Apache License 2.0, with upstream notices
+retained in dependency metadata. https://android.googlesource.com/platform/frameworks/support/
+https://github.com/gradle/gradle
+
+Third-party software and models retain their own licenses, independently of
+the SimpleBoard project license. Existing vendored copyright and license
+headers are preserved.

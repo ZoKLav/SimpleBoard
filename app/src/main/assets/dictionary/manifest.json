@@ -1,0 +1,8 @@
+{
+  "source": "https://github.com/dwyl/english-words/blob/master/words_alpha.txt",
+  "license": "Unlicense",
+  "attribution_required": false,
+  "entries": 370105,
+  "sha256": "1198a3786bed510b4f8127f73a74c38596088a220d318d962e689dc6f0792599",
+  "changes": "ASCII letters, lowercase, at most 40 characters, unique and sorted."
+}
